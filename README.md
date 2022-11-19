@@ -105,6 +105,7 @@ $ terraform apply
 
 # :1234: 인원(TBD)
 - [조승현](https://github.com/wjrmffldrhrl)
+- [김건우](https://github.com/kgw7401)
 
 # :calendar: 주간 계획(TBD)
 |주차|날짜|챕터|발표자|
