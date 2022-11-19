@@ -79,7 +79,8 @@ $ terraform apply
 ## :alarm_clock: 시간(TBD)
 매주 일요일 오후 10시에 온라인으로 진행해요
 - 지각비나 보증금을 받지 않아요.
-- 상호 신뢰를 기반으로 열심히 진행해요 :muscle:
+- 상호 신뢰를 기반으로 열심히 진행해요 :muscle:  
+
 
 ## :tokyo_tower: 장소
 - 온라인으로 진행해요
@@ -99,7 +100,8 @@ $ terraform apply
 - 발표를 진행하면서 자유롭게 질문도 받아요
 - 발표가 끝나고 자유롭게 서로 의견이나 질문을 나눠요
   - 발표자가 진행해주셔도 좋아요
-- 실습하면서 어려움이 생기거나 궁금한점이 생겼는데 바로 해결하고 싶을 때는 해당 레포의 [issue](https://github.com/wjrmffldrhrl/Terraform-Study-1st/issues)에 올려주세요
+- 실습하면서 어려움이 생기거나 궁금한점이 생겼는데 바로 해결하고 싶을 때는 해당 레포의 [issue](https://github.com/wjrmffldrhrl/Terraform-Study-1st/issues)에 올려주세요  
+
 
 # :1234: 인원(TBD)
 - [조승현](https://github.com/wjrmffldrhrl)
