@@ -34,7 +34,7 @@ $ terraform apply
 
 # 목표인 것
 - IaC를 지향해야 하는 이유 알기
-- Terraform이 뭔지 알기
+- Terraform이 무엇인지 알기
 - Terraform을 왜 사용해야 하는지 알기
 - Terraform을 언제 사용해야 하는지 알기
 - Terraform 사용하는 방법 알기
@@ -47,7 +47,7 @@ $ terraform apply
 - Terraform 고수되기  
 - 인프라 고수되기
 - GCP, AZURE, NCP에 인프라 구성해보기
-- Terraform Up & Running 5챕터 이후 내용 
+- Terraform Up & Running 5챕터 이후 내용 다루기
 
 # 대상
 - 현직자
@@ -61,7 +61,7 @@ $ terraform apply
   - 풀스택 개발자
   - CTO
   - 코드를 작성할 줄 알지만 운영은 잘 모르는 개발자
-  - 운영은 잘 하지만 코드는 잘 작성하지 못하는 인프라 엔지니어
+  - 운영은 잘 알지만 코드는 잘 작성하지 못하는 인프라 엔지니어
   - 이직 준비생
 - 취준생
 - 대학생
@@ -70,8 +70,8 @@ $ terraform apply
 # 준비물
 - Terraform Up & Running 책 (2판 이상)
   - Terraform Up & Running 3판이 22년도에 출판됐어요
-  - 책의 1/3이상이 변경될 정도로 많은 변화가 있지만 대부분 5챕터 이후의 내용들이라서 이번 스터디에서는 2판 이상이면 충분할 것 같아요
-  - 혹시나 다른 내용이 있더라도 스터디 인원들과 맞춰보면서 진행하면 문제 없다고 생각해요 :heart:
+  - 책의 1/3 이상이 변경될 정도로 많은 변화가 있지만 대부분 5챕터 이후의 내용들이라서 이번 스터디에서는 2판 이상이면 충분할 것 같아요
+  - 혹시나 다른 내용이 있더라도 스터디 인원들과 맞춰보면서 진행하면 문제 없다고 생각해요 👍
 - AWS 계정
 - 컴퓨터
 
@@ -84,8 +84,8 @@ $ terraform apply
 ## 장소
 - 온라인으로 진행해요
   - Zoom이나 Discord 등 음성 미팅이 가능하다면 모두 고려대상에 있어요
-- 스터디가 잘 끝나고 나면 점심 or 저녁 함께 해보려고 해요
-  - 필수는 아니에요
+- 스터디 4회차가 모두 끝나면 점심 or 저녁을 함께 해보려고 해요
+  - 필수는 아니에요 😄
 
 ## :eyes: 진행 방법(TBD)
 - [Terraform Up & Running](https://www.oreilly.com/library/view/terraform-up-and/9781098116736/?_gl=1*1eaphy7*_ga*NjI5MDc0ODg3LjE2Njg4NDIxMTI.*_ga_092EL089CH*MTY2ODg0MjExMS4xLjEuMTY2ODg0MjE0My4yOC4wLjA.)을 일주일동안 읽어요
@@ -97,10 +97,11 @@ $ terraform apply
 - 발표를 진행하면서 자유롭게 질문도 받아요
 - 발표가 끝나고 자유롭게 서로 의견이나 질문을 나눠요
   - 발표자가 진행해주셔도 좋아요
-- 실습하면서 어려움이 생기거나 궁금한점이 생겼는데 바로 해결하고 싶을 때는 해당 레포의 issue
+- 실습하면서 어려움이 생기거나 궁금한점이 생겼는데 바로 해결하고 싶을 때는 해당 레포의 issue에 올려주세요
 
 # :ok_woman: 인원(TBD)
 - [조승현](https://github.com/wjrmffldrhrl)
+
 # :calendar: 주간 계획(TBD)
 |주차|날짜|챕터|발표자|
 |:---:|:---:|---|:---:|
