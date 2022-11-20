@@ -76,22 +76,23 @@ $ terraform apply
 - 컴퓨터
 
 # :key: 방식
-## :alarm_clock: 시간(TBD)
-매주 일요일 오후 10시에 온라인으로 진행해요
+## :alarm_clock: 시간
+매주 일요일 오후 9시에 온라인으로 진행해요
 - 지각비나 보증금을 받지 않아요.
 - 상호 신뢰를 기반으로 열심히 진행해요 :muscle:  
 
 
 ## :tokyo_tower: 장소
-- 온라인으로 진행해요
-  - Zoom이나 Discord 등 음성 미팅이 가능하다면 모두 고려대상에 있어요
+- Google meet에서 온라인으로 진행해요
+  - [재영](https://github.com/heartcored98)님이 캘린더로 초대 주실 예정이에요
+  - [Week 0](https://github.com/wjrmffldrhrl/Terraform-Study-1st/issues/3)에 이메일을 코멘트로 남겨주세요
 - 스터디 4회차가 모두 끝나면 점심 or 저녁을 함께 해보려고 해요
   - 필수는 아니에요 😄
 
-## :eyes: 진행 방법(TBD)
+## :eyes: 진행 방법
 - [Terraform Up & Running](https://www.oreilly.com/library/view/terraform-up-and/9781098116736/?_gl=1*1eaphy7*_ga*NjI5MDc0ODg3LjE2Njg4NDIxMTI.*_ga_092EL089CH*MTY2ODg0MjExMS4xLjEuMTY2ODg0MjE0My4yOC4wLjA.)을 일주일동안 읽어요
 - 각자 읽은 내용을 바탕으로 정리해봐요
-  - 다른사람에게 설명하기 용이한 형태로 정리해요
+  - 다른 사람에게 설명하기 용이한 형태로 정리해요
   - 책에 나온 내용 이외에 얻게된 정보가 있으면 정리 내용에 포함해요
   - 어려웠던 내용이나 궁금했던 내용을 찾아서 정리 내용에 포함하거나 질문을 준비해요
   - 정리한 내용은 해당 repo에 [PR](https://github.com/wjrmffldrhrl/Terraform-Study-1st/pulls)로 공유해주세요
@@ -113,7 +114,7 @@ $ terraform apply
 - [이은빈](https://github.com/teno4944)
 - [염경현](https://github.com/Gyeong-Hyeon)
 
-# :calendar: 주간 계획(TBD)
+# :calendar: 주간 계획
 |주차|날짜|챕터|발표자|
 |:---:|:---:|---|:---:|
 |0주차|11/20|Planning|[조승현](https://github.com/wjrmffldrhrl)|
