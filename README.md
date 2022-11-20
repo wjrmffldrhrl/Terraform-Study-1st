@@ -111,6 +111,7 @@ $ terraform apply
 - [이힘찬](https://github.com/ssilb4)
 - [허준혁](https://github.com/JamesHeo)
 - [teno4944](https://github.com/teno4944)
+- [Gyeong-Hyeon](https://github.com/Gyeong-Hyeon)
 
 # :calendar: 주간 계획(TBD)
 |주차|날짜|챕터|발표자|
