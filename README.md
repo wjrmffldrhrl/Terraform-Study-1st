@@ -108,7 +108,7 @@ $ terraform apply
 - [김건우](https://github.com/kgw7401)
 - [송지원](https://github.com/JionisGenius)
 - [조재영](https://github.com/heartcored98)
-- [ssilb4](https://github.com/ssilb4)
+- [이힘찬](https://github.com/ssilb4)
 - [허준혁](https://github.com/JamesHeo)
 - [teno4944](https://github.com/teno4944)
 
