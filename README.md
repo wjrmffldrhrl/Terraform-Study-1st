@@ -107,6 +107,9 @@ $ terraform apply
 - [조승현](https://github.com/wjrmffldrhrl)
 - [김건우](https://github.com/kgw7401)
 - [송지원](https://github.com/JionisGenius)
+- [조재영](https://github.com/heartcored98)
+- [ssilb4](https://github.com/ssilb4)
+- [허준혁](https://github.com/JamesHeo)
 
 # :calendar: 주간 계획(TBD)
 |주차|날짜|챕터|발표자|
