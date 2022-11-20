@@ -111,7 +111,7 @@ $ terraform apply
 - [이힘찬](https://github.com/ssilb4)
 - [허준혁](https://github.com/JamesHeo)
 - [teno4944](https://github.com/teno4944)
-- [Gyeong-Hyeon](https://github.com/Gyeong-Hyeon)
+- [염경현](https://github.com/Gyeong-Hyeon)
 
 # :calendar: 주간 계획(TBD)
 |주차|날짜|챕터|발표자|
@@ -123,6 +123,6 @@ $ terraform apply
 |4주차|12/18|How To Create Reusable Infrastructure With Terraform Modules||  
 
 # :door: 참여 방법
-아래 방법으로 성함과 깃허브 아이디를 전달해주세요~!
+아래 방법중 하나로 성함과 깃허브 아이디를 전달해주세요~!
 - [Terraform study 1st에 오신것을 환영합니다!](https://github.com/wjrmffldrhrl/Terraform-Study-1st/issues/1) issue에 코멘트 남기기
 - wjrmffldrhrl@gmail.com 으로 이메일 보내기
