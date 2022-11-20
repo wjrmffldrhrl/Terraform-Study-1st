@@ -110,7 +110,7 @@ $ terraform apply
 - [조재영](https://github.com/heartcored98)
 - [이힘찬](https://github.com/ssilb4)
 - [허준혁](https://github.com/JamesHeo)
-- [](https://github.com/teno4944)
+- [이은빈](https://github.com/teno4944)
 - [염경현](https://github.com/Gyeong-Hyeon)
 
 # :calendar: 주간 계획(TBD)
