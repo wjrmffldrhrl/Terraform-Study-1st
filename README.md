@@ -104,7 +104,7 @@ $ terraform apply
 - 실습하면서 어려움이 생기거나 궁금한점이 생겼는데 바로 해결하고 싶을 때는 해당 레포의 [issue](https://github.com/wjrmffldrhrl/Terraform-Study-1st/issues)에 올려주세요  
 
 
-# :1234: 인원(TBD)
+# :1234: 인원
 - [조승현](https://github.com/wjrmffldrhrl)
 - [김건우](https://github.com/kgw7401)
 - [송지원](https://github.com/JionisGenius)
