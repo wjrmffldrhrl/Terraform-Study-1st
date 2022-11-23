@@ -1,20 +1,3 @@
-words  
-- redundant : 낭비되는
-- dedicate : 바치다 봉사하다
-- cadence: 마침
-- occasionally: 가끔
-- mess: 엉망인 상태
-- halt: 멈추다
-- profound: 깊은, 엄청난
-- taking place: 일어나다.
-- distinction: 차이
-- slightly: 약간, 조금의
-- undergo: 겪다
-- astounding: 경악스러운 믿기 어려움
-- defect: 결함
-- measurement: 측정, 측량
-- comprehensive: 포괄적인
-
 # What is DevOps
 
 과거에는 소프트웨어 회사를 만들려면 아주 많은 하드웨어를 다뤄야 했다.  
@@ -69,4 +52,25 @@ DevOps의 4가지의 주요 행동이 있다.
 
 이것을 Infrastructure as Code라고 한다.
 
-What is outage?
+### Q
+- What is outage?
+
+
+# What is Infrastructure as Code
+
+# words  
+- redundant : 낭비되는
+- dedicate : 바치다 봉사하다
+- cadence: 마침
+- occasionally: 가끔
+- mess: 엉망인 상태
+- halt: 멈추다
+- profound: 깊은, 엄청난
+- taking place: 일어나다.
+- distinction: 차이
+- slightly: 약간, 조금의
+- undergo: 겪다
+- astounding: 경악스러운 믿기 어려움
+- defect: 결함
+- measurement: 측정, 측량
+- comprehensive: 포괄적인
