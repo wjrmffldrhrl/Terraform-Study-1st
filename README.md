@@ -113,6 +113,7 @@ $ terraform apply
 - [허준혁](https://github.com/JamesHeo)
 - [이은빈](https://github.com/teno4944)
 - [염경현](https://github.com/Gyeong-Hyeon)
+- [0805004949](https://github.com/0805004949)
 
 # :calendar: 주간 계획
 |주차|날짜|챕터|발표자|
