@@ -52,9 +52,6 @@ DevOps의 4가지의 주요 행동이 있다.
 
 이것을 Infrastructure as Code라고 한다.
 
-### Q
-- What is outage?
-
 
 # What is Infrastructure as Code
 
@@ -261,8 +258,6 @@ resource "aws_instance" "app" {
 - 재미없게 반복되는 수동 작업은 작업자를 불행하게 만든다.
 - IaC를 통해 지루한 수동 작업에서 벗어날 수 있다.
 
-
-
 # How Does Terraform Work?
 
 terraform은 HashiCorp가 오픈소스로 개발하였고 go로 작성되었다.  
@@ -292,6 +287,9 @@ terraform이 당신의 코드를 binary parse하여 코드에 명시된 cloud pr
 
 > terraform이 다양한 cloud platform의 provider를 지원하기 때문에 한 코드로 다양한 서버에 배포가 가능한지 궁금해하지만 완벽히 똑같은 구성을 배포하는건 할 수 없다.  
 > 다른 클라우드 플랫폼은 같은 형태의 인프라를 제공하지 않기 때문이다.
+
+### Q
+- What is outage?
 
 
 # words  
