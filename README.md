@@ -2,6 +2,7 @@
 
 과거에는 모든 인프라를 수동으로 배포했어요  
 
+
 이 시기는 어둠과 공포의 시기였어요
 - 서버가 내려간다면?
 - 구성을 잘못했다면?
@@ -113,7 +114,7 @@ $ terraform apply
 - [허준혁](https://github.com/JamesHeo)
 - [이은빈](https://github.com/teno4944)
 - [염경현](https://github.com/Gyeong-Hyeon)
-- [0805004949](https://github.com/0805004949)
+- [바삭한다리](https://github.com/0805004949)
 
 # :calendar: 주간 계획
 |주차|날짜|챕터|발표자|
