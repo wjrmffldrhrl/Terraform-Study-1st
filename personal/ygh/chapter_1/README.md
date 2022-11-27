@@ -1,13 +1,10 @@
 # Chapter1: 테라폼을 사용해야하는 이유
 
-## What Is DevOps?: DevOps란
----
- 1. 과거 Dev(Developers, 개발팀, 하드웨어 구축 담당)팀과 Ops(Operations, 운영팀, 배포 및 운영 담당)팀이 나눠져있던 시절의 문제점으로 인한 One-team화
+## What Is DevOps?: DevOps의 탄생
+
+ 1. 과거 Dev(Developers, 개발팀, 하드웨어 구축 담당)팀과 Ops(Operations, 운영팀, 배포 및 운영 담당)팀이 별도로 작업 및 배포를 했을 때에는 개발 서버와 운영 서버 간의 설정 간극이 생기고, 그런 서버들이 회사 규모가 커지면서 점점 늘어나면서 개발 서버와 배포 서버의 의미가 사라지고, Dev팀과 Ops팀의 사일로화가 심해짐 ➣ 두 팀의 통합에 대한 근거
     
     `Snowflake servers`: 회사 규모 확대 → 서버 증가 → 개발 서버에서는 잘 작동했으나 배포시 문제 발생하는 경우가 더 많이 발생 → 문제가 되는 서버만 임의로 수정 → 각 서버마다 다른 configuration을 가지게 되는 경우가 많아짐
- 
- ➢ Dev팀과 Ops팀의 사일로화로 인한 문제점 발견으로 인해 DevOps 탄생
-
 
  2. 클라우드의 발전으로 인프라 구축/유지에 소요되는 리소스가 줄어듦에 따라, Dev팀과 Ops팀 모두 물리적인 곳 보다 sysadmin 코드 작성에 더 많은 시간을 쏟게 되면서 두 팀간의 경계가 희미해짐
 
@@ -18,9 +15,8 @@
 </br>
 
 ## What Is Infrastructure as Code?: IaC란?
----
 
- <center><h3 style="color:gray"> "인프라를 코드로 정의, 배포, 업데이트, 제거하는 것" </h3></center>
+### $${\color{red}"인프라를 코드로 정의, 배포, 업데이트, 제거하는 것"}$$
 
 </br>
 
@@ -56,8 +52,10 @@
  Server Templating Tool의 핵심은 **인프라의 항상성 유지** - 한번 정의된 서버는 그 정의를 바꾸지 않고 항상 동일한 상태를 유지하도록 하며, 바꾸어야하는 경우 새로운 버전의 템플릿을 작성하는 방향을 제시
 
  * 이미지 관련 툴 - **가상머신과 컨테이너**
+
   둘의 차이는 추상화 정도.
-VM은 Host OS단 ~ 하드웨어 단으로 서버의 OS 커널과 하드웨어가지도 격리하지만 컨테이너는 Kernal space가 아닌 User space 위에 컨테이너 엔진을 띄우기 때문에 각 Guest OS 간 커널과 하드웨어는 공유 (별도 virtualization.md 파일 참고)
+
+VM은 Host OS단 ~ 하드웨어 단으로 서버의 OS 커널과 하드웨어가지도 격리하지만 컨테이너는 Kernal space가 아닌 User space 위에 컨테이너 엔진을 띄우기 때문에 각 Guest OS 간 커널과 하드웨어는 공유 (별도 `virtualization.md` 파일 참고)
 
 ### IaC 방법 4. Orchestration Tools
  
@@ -74,7 +72,7 @@ VM은 Host OS단 ~ 하드웨어 단으로 서버의 OS 커널과 하드웨어가
 
  Sever Templating Tool 중 하나인 Docker image를 관리해주는 툴인 Kubernetes의 마스터노드를 관리해주는 서비스로 각 3 클라우드 벤더사에 EKS, GKE, AKS가 있음
 
- <font color="gray" size="x-small"> (관리를 위한 관리를 위한 관리랄까.. 관리자라고 해서 관리가 필요하지 않은 것은 아니다. 마치 CICD 파이프라인이 생겼다고 QA가 짤리지 않듯..) </font>
+$${\color{grey}(관리를 위한 관리를 위한 관리랄까.. 관리자라고 해서 관리가 필요하지 않은 것은 아니다. 마치 CICD 파이프라인이 생겼다고 QA가 짤리지 않듯..)}$$
 
 ### IaC 방법 5. Provisioning Tools
 
@@ -85,7 +83,7 @@ VM은 Host OS단 ~ 하드웨어 단으로 서버의 OS 커널과 하드웨어가
 </br>
 
 ```
-IaC의 장점
+📌 IaC의 장점
  1. DevOps의 과정을 코드화: 수동 작업으로 생기는 오류 제거, 자동화되는 작업들이 생기면서 작업 리소스를 효율적으로 분배할 수 있게 됨
  2. 안전성, 신뢰성 확보
  3. 변경사항의 history가 보관되어 있음: 재현가능성 증가, 재사용(=복제)-수정-버저닝 가능
@@ -93,7 +91,6 @@ IaC의 장점
 ```
 
 ## IaC 툴을 선정할 때 고려해야할 부분들
----
 
  많은 IaC툴들이 중복된 기능들을 제공하기 때문에 선택에 있어 다음과 같은 기준들을 제시
 
@@ -106,6 +103,7 @@ IaC의 장점
 ### 변경 가능성이 있는 인프라 vs 변경 가능성이 없는 인프라 (?)
 
  * 대부분의 형식적인 configuration management tools은 Mutable infrastructure 파라다임
+   
     ➢ 이미 존재하는 서버에 변경을 가하는 작업을 수행하기 때문에 기존에 구성되어있는 서버의 영향을 받고, 각 서버(개발vs운영)마다 설정이 달라지는 문제 발생 가능성 존재
 
  * provisioning tool은 배포가 진행될 때마다 새로운 서버에서 새로운 이미지를 생성하기 때문에 Immutable infrastructure 패러다임
@@ -136,7 +134,7 @@ IaC의 장점
     - 절차형: 변경사항이 아닌 코드 자체를 반영하므로 25개를 새로 생성해서 총 클러스터 개수는 30개가 되고
     - 선언형: 변경사항을 반영하기 때문에 해당 코드를 돌렸을 때 최종 파라미터 개수가 25개가 되도록 20개만 추가로 생성
 
- 따라서, **"코드의 재사용이 제한적임"**.
+ 따라서 **"코드의 재사용이 제한적임"**.
 
  반면, 선언형 언어의 경우 코드의 변경사항을 인식할 수 있기 때문에 작성자는 desired state만 고려하여 코드를 작성하면 됨
 
@@ -148,12 +146,12 @@ IaC의 장점
 
     ✓ DSL (Domain-Specific Language) : Terraform-HCL, Puppet-Puppet Language
 
- * DSL을 지원하는 툴과 비교했을 때 GPL을 지원하는 IaC툴의 장점:
+ * DSL을 지원하는 툴과 비교했을 때 **GPL**을 지원하는 IaC툴의 장점:
     1. 복잡한 로직(loops, conditionals,..) 구현 용이
     2. 다른 툴/ API와의 통합 기능을 쉽게 제공
     3. 커뮤니티
 
- * GPL을 지원하는 툴과 비교했을 때 DSL을 지원하는 IaC툴의 장점:
+ * GPL을 지원하는 툴과 비교했을 때 **DSL**을 지원하는 IaC툴의 장점:
     1. 특정 목적 하나를 위해 개발된 언어기 때문에 사용되는 변수나 키워드들이 명확
     2. 단일화된 형태로 작성되기 때문에 예측가능한 구조를 취하며, 검색 용이
 
@@ -167,15 +165,21 @@ IaC의 장점
   * CloudFormation, Heat, Terraform, Pulumi: Masterless(default) 또는 마스터 서버를 추가 서버가 아닌 인프라의 일부로 설정
   * Ansible: Masterless, 각 서버 간 SSH로 연결
 
+  (맨 마지막 툴 정리 부분 표 참고)
+
 </br>
 
  ### Agent vs Agentless
  
  Agent 방식의 경우 별도 소프트웨어 설치가 필요하기 때문에 해당 소프트웨어를 어떻게 설치/업데이트할 것인가에 대한 고민과 보안 문제가 단점으로 작용
 
+```
  Agent 워크스테이션 → Agent 서버 → 앱서버 통신 과정 추가 → 에러 발생 확률 상승
+```
 
  Agentless의 경우 Cloud provider의 API를 사용하거나(e.g. Terraform) SSH와 같은 이미 서버에서 돌아가고 있는 일반적인 데몬을 사용(e.g. Ansible)하여 인증을 진행
+
+</br>
 
  ### 무료 vs 유료
 
@@ -190,7 +194,7 @@ IaC의 장점
 </br>
 
  ## 여러 IaC 툴들을 동시에 사용하기
----
+
  ### Provisiong + Configuration management
 
  ✓ 예시:
@@ -208,6 +212,8 @@ IaC의 장점
     - 인프라(서버, 네트워크 등)와 해당 서버 위에 VM 배포: Terraform
  장점: 두 툴 모두 client-only 어플리케이션이기 때문에 추가 인프라 설치 불필요, immutable 인프라들로 구성되어 있기 때문에 항상성 유지 (코드가 변경될 경우 현재 서버를 죽이고 새로운 서버를 생성함)
  단점: VM을 빌드 및 배포하는데 많은 시간 소요, 배포 전략 제한(Terraform)
+
+</br>
 
  ### Provisioning + Server templating + Orchestration
 
