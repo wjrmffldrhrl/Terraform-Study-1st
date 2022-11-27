@@ -181,7 +181,7 @@ release된 시간이나 version 만으로 성숙도를 판단할 수 없지만 �
 ## Use of Multiple Tools Together
 ### Provisioning plus configuration management
 Ansible과 Terraform을 함께 구성하여 사용할 수 있다.
-- 단점으로는 Ansible을 사용하기 때문에 많은 절차적 코드를 작성하므로 코드베이스, 인프라 및 팀이 성장함에 따라 유지관리가 더 어려워질 수 있다.
+- 단점으로는 Ansible을 사용하기 때문에 많은 절차적 코드를 작성하므로 코드베이스, 인프라 및 팀이 성장함에 따라 유지관리가 더 어려워질 수 있다.  
 ![1_3.png](../images/1_4.png)
 
 ### Provisioning plus server templating
