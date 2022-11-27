@@ -1,4 +1,4 @@
-# :sunny: Terraform-Study-1st-test
+# :sunny: Terraform-Study-1st
 
 과거에는 모든 인프라를 수동으로 배포했어요  
 
