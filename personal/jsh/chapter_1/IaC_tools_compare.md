@@ -194,7 +194,7 @@ Terraform과 packer를 사용하여 앱을 VM으로 배포할 수 있다.
 
 Terraform과 Docker 및 kubernetes를 사용한다.
 - docker image가 빠르게 빌드 및 배포 가능한 장점
-- 실행할 추가 인프라가 많아지므로 복잡성이 추가된다.
+- 실행할 추가 인프라가 많아지므로 복잡성이 추가된다.  
 ![1_3.png](../images/1_6.png)
 
 > (Packer는 왜 계속 나오지?)
