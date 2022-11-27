@@ -187,7 +187,7 @@ Ansible과 Terraform을 함께 구성하여 사용할 수 있다.
 ### Provisioning plus server templating
 Terraform과 packer를 사용하여 앱을 VM으로 배포할 수 있다.
 - VM을 구축하는데 시간이 더 소모된다.
-- 복잡한 배포 전략을 구현하기가 힘들다.
+- 복잡한 배포 전략을 구현하기가 힘들다.  
 ![1_3.png](../images/1_5.png)
 
 ### Provisioning plus server templating plus orchestration
