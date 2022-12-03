@@ -66,7 +66,7 @@ resource "<PROVIDER>_<TYPE>" "<NAME>" {
 위 형식대로 aws EC2 instance를 생성한다고 하면 아래와 같다.
 ```
 resource "aws_instance" "example" {
-  ami           = "ami-0fb653ca2d3203ac1"
+  ami           = "ami-0ab04b3ccbadfae1f"
   instance_type = "t2.micro"
 }
 ```
@@ -108,7 +108,7 @@ Terraform will perform the following actions:
 
   # aws_instance.example will be created
   + resource "aws_instance" "example" {
-      + ami                          = "ami-0fb653ca2d3203ac1"
+      + ami                          = "ami-0ab04b3ccbadfae1f"
       + arn                          = (known after apply)
       + associate_public_ip_address  = (known after apply)
       + availability_zone            = (known after apply)
@@ -147,7 +147,7 @@ Terraform will perform the following actions:
 
   # aws_instance.example will be created
   + resource "aws_instance" "example" {
-      + ami                          = "ami-0fb653ca2d3203ac1"
+      + ami                          = "ami-0ab04b3ccbadfae1f"
       + arn                          = (known after apply)
       + associate_public_ip_address  = (known after apply)
       + availability_zone            = (known after apply)
@@ -179,7 +179,7 @@ Do you want to perform these actions?
 
 ```
 resource "aws_instance" "example" {
-  ami           = "ami-0fb653ca2d3203ac1"
+  ami           = "ami-0ab04b3ccbadfae1f"
   instance_type = "t2.micro"
   tags = {
     Name = "terraform-example"
@@ -210,6 +210,103 @@ $ terraform apply
 
 
 # Deploying a single web server 
+![2_1.png](../images/2_1.png)
+위와 같은 간단한 웹 서버를 구성해본다.  
+
+웹 프레임워크가 아닌 단순 `Hello, World`만을 반환하는 웹 서버를 구성한다.  
+
+```
+#!/bin/bash
+echo "Hello, World" > index.html
+nohup busybox httpd -f -p 8080 &
+```
+index.html 파일 생성 및 ubuntu 기본 프로그램인 busybox 실행으로 구현한다.  
+
+> nohup 란?
+> no hang up의 약자로 프로세스를 데몬 형태의 백그라운드로 실행할 수 있는 명령어  
+> `&` 만을 사용하면 터미널 세션이 끊기면 백그라운드 작업도 종료된다.
+
+해당 스크립트는 Packer와 같은 Server Templating Tool을 사용할 수 있겠지만, User Data configuration을 사용하면 간단하게 적용 가능하다.  
+
+```
+resource "aws_instance" "example" {
+  ami                    = "ami-0ab04b3ccbadfae1f"
+  instance_type          = "t2.micro"
+  user_data = <<-EOF
+              #!/bin/bash
+              echo "Hello, World" > index.html
+              nohup busybox httpd -f -p 8080 &
+              EOF
+  user_data_replace_on_change = true
+  tags = {
+    Name = "terraform-example"
+  } 
+}
+```
+- `user_data_replace_on_chnage`: `user_data` parameter를 변경하고 `apply`를 수행하면 Terraform은 기존 instance를 제거하고 새롭게 생성한다.  
+  - Terraform은 update를 기본으로 동작하지만 User Data는 first boot에서만 수행 가능하다.  
+
+외부 트래픽이 instance에 접근할 수 있도록 security group을 생성하고 적용해야 한다.  
+
+```terraform
+resource "aws_security_group" "instance" {
+  name = "terraform-example-instance"
+  ingress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  } 
+}
+```
+
+> [CIDR block 이란?](https://ko.wikipedia.org/wiki/CIDR)
+> CIDR(Classless Inter-Domain Routing)는 클래스 없는 도메인 간 라우팅 기법으로 1993년 도입되기 시작한, 최신의 IP 주소 할당 방법이다.  
+> CIDR 블록이라 불리는 그룹에 포함된 여러 IP 주소는 이진 표기를 하였을 때 동일한 일련의 초기 비트를 가진다
+> 여기서는 허용할 ip에 대해 정의한다.  
+
+생성한 security group을 ec2 instance에 적용하기 위해서는 security gruop id를 ec2 instance `vpc_security_group_ids` argument에 전달해야 한다.  
+
+Terraform에서는 생성한 모든 resource에 대한 반환값을 가지며 이러한 반환값을 사용하기 위해서는 아래와 같은 resource attribute reference를 사용하면 된다.  
+
+```
+<PROVIDER>_<TYPE>.<NAME>.<ATTRIBUTE>
+```
+security group 같은 경우에는 아래와 같다. 
+```
+aws_security_group.instance.id
+```
+
+이 값을 aws_instance에 전달하면 된다.
+```terraform
+resource "aws_instance" "example" {
+  ami                    = "ami-0ab04b3ccbadfae1f"
+  instance_type          = "t2.micro"
+  vpc_security_group_ids = [aws_security_group.instance.id]
+  user_data = <<-EOF
+              #!/bin/bash
+              echo "Hello, World" > index.html
+              nohup busybox httpd -f -p 8080 &
+              EOF
+  user_data_replace_on_change = true
+  tags = {
+    Name = "terraform-example"
+  } 
+}
+```  
+
+만약 한 리소스를 다른 리소스에서 참조한다면 implicit dependency를 생성하게 되고 Terraform은 이러한 의존성을 그래프로 나타내고 리소스를 생성해야 하는 순서를 자동으로 결정한다.  
+- 그러므로 해당 Terraform 파일을 처음부터 적용하면 security group을 먼저 생성한다.  
+
+`terraform apply`로 리소스 적용하면 잘 생성된다.
+> 잘 되네요~!
+```
+❯ curl http://ec2-15-164-98-213.ap-northeast-2.compute.amazonaws.com:8080
+Hello, World
+```
+
+`terraform destroy`로 정리하자  
+
 # Deploying a configurable web server 
 # Deploying a cluster of web servers 
 # Deploying a load balancer
