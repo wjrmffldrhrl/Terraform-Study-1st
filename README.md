@@ -120,7 +120,7 @@ $ terraform apply
 |주차|날짜|챕터|발표자|
 |:---:|:---:|---|:---:|
 |0주차|11/20|Planning|[조승현](https://github.com/wjrmffldrhrl)|
-|1주차|11/27|Why Terraform||
+|1주차|11/27|Why Terraform|[조승현](https://github.com/wjrmffldrhrl)|
 |2주차|12/4|Getting Started With Terraform||
 |3주차|12/11|How To Manage Terraform State||
 |4주차|12/18|How To Create Reusable Infrastructure With Terraform Modules||  
