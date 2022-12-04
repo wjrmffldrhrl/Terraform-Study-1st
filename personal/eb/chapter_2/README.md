@@ -48,7 +48,7 @@ $ export AWS_ACCESS_KEY_ID=(액세스 키 ID)
 $ export AWS_SECRET_ACCESS_KEY=(비밀 액세스 키)
 ```
 
-- 자격증면 파일 사용 *$HOME/.aws/credentials*
+- 자격증명 파일 사용 *$HOME/.aws/credentials*
 
 ```bash
 [default]
@@ -62,7 +62,7 @@ aws_secret_access_key=(비밀 액세스 키)
 
 - 공급자 구성
 
-```json
+```
 provider "aws" {
   region = "us-east-2"
 }
@@ -70,7 +70,7 @@ provider "aws" {
 
 - 리소스 정의
 
-```json
+```
 resource "<PROVIDER>_<TYPE>" "<NAME>" {
   [CONFIG ...]
 }
@@ -78,12 +78,10 @@ resource "<PROVIDER>_<TYPE>" "<NAME>" {
 
 - main.tf
 
-```json
-# 공급자 구성
+```
 provider "aws" {
   region = "us-east-2"
 }
-# 리소스 생성
 resource "aws_instance" "example" {
   ami           = "ami-0fb653ca2d3203ac1"
   instance_type = "t2.micro"
@@ -106,7 +104,7 @@ Initializing provider plugins...
 
 - terraform plan
 
-```bash
+```
 ui-MacBook-Pro:terraform aa$ terraform plan
 
 Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the following symbols:
@@ -139,7 +137,7 @@ Terraform will perform the following actions:
 
 - terraform apply
 
-```bash
+```
 ui-MacBook-Pro:terraform aa$ terraform apply
 
 Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the following symbols:
@@ -182,7 +180,7 @@ HTTP 요청에 응답할 수 있는 단일 웹 서버 배포
 
 - 기본 우분투 18.04 AMI 에 user_data 인수를 설정하여 busybox 실행한다
 
-```bash
+```
 resource "aws_instance" "example" {
   ami                    = "ami-0fb653ca2d3203ac1"
   instance_type          = "t2.micro"
