@@ -1,1 +1,4 @@
 credential
+.terraform*
+*.tfstate
+*.tfstate.backup
