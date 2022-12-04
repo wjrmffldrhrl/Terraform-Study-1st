@@ -58,7 +58,7 @@ aws_secret_access_key=(비밀 액세스 키)
 
 # 3: 단일 서버 배포
 
-빈 디렉토리에 [main.tf](main.tf) 파일을 생성하고 공급자 구성 및 리소스 정의 후 `terraform init` 
+빈 디렉토리에 [main.tf](terraform/main.tf) 파일을 생성하고 공급자 구성 및 리소스 정의 후 `terraform init` 
 
 - 공급자 구성
 
@@ -359,7 +359,7 @@ public_ip = "18.221.24.208"
 
 여러대의 서버를 쓰레숄드에 따라 자동으로 증감시키기 위해 오토스케일링 그룹을 사용한다.
 
-![Untitled](asset/chapter_2_3.png)
+![Untitled](./asset/chapter_2_3.png)
 
 ## 1) 스케일링할 인스턴스 정의
 
