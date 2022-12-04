@@ -38,7 +38,7 @@ HCL로 작성된 .tf 확장자 파일을 생성하여 인프라에 대해 작성
 
 먼저 어떤 provider를 사용할지 정의한다.
 
-```
+```terraform
 # AWS provider 사용
 ## us-east-2 리전 사용
 provider "aws" {
@@ -51,7 +51,7 @@ AWS는 여러 지역으로 나눠져있고 각 지역은 Availability Zone이라
 
 
 provider가 생성할 수 있는 resource의 종류는 다양하며 일반적인 형태는 아래와 같다.
-```
+```terraform
 resource "<PROVIDER>_<TYPE>" "<NAME>" {
   [CONFIG ...]
 }
@@ -64,7 +64,7 @@ resource "<PROVIDER>_<TYPE>" "<NAME>" {
 
 
 위 형식대로 aws EC2 instance를 생성한다고 하면 아래와 같다.
-```
+```terraform
 resource "aws_instance" "example" {
   ami           = "ami-0ab04b3ccbadfae1f"
   instance_type = "t2.micro"
@@ -177,7 +177,7 @@ Do you want to perform these actions?
 생성한 instance에 tag를 추가하는 등 기존에 생성한 리소스에 변경사항을 적용하면 Terraform은 변경사항에 대해 추적할 수 있다.  
 
 
-```
+```terraform
 resource "aws_instance" "example" {
   ami           = "ami-0ab04b3ccbadfae1f"
   instance_type = "t2.micro"
@@ -228,7 +228,7 @@ index.html 파일 생성 및 ubuntu 기본 프로그램인 busybox 실행으로 
 
 해당 스크립트는 Packer와 같은 Server Templating Tool을 사용할 수 있겠지만, User Data configuration을 사용하면 간단하게 적용 가능하다.  
 
-```
+```terraform
 resource "aws_instance" "example" {
   ami                    = "ami-0ab04b3ccbadfae1f"
   instance_type          = "t2.micro"
@@ -312,7 +312,7 @@ Hello, World
 ### Input variable
 코드의 재사용성을 증가시키기 위해서 Terraform은 variable를 제공한다.  
 
-```
+```terraform
 variable "NAME" {
   [CONFIG ...]
 }
@@ -328,7 +328,7 @@ variable "NAME" {
 
 
 복잡한 형태의 variable도 구성할 수 있다.
-```
+```terraform
 variable "object_example" {
   description = "An example of a structural type in Terraform"
   type        = object({
@@ -348,7 +348,7 @@ variable "object_example" {
 ```
 
 서버 구성 시 port 번호를 재사용 하기 위해 variable을 사용할 수 있다.
-```
+```terraform
 variable "server_port" {
   description = "The port the server will use for HTTP requests"
   type        = number
@@ -369,7 +369,7 @@ $ terraform plan
 ```
 
 이렇게 command line에서 값을 전달하기 싫다면 variable box 내부에 default를 추가하면 된다.  
-```
+```terraform
 variable "server_port" {
   description = "The port the server will use for HTTP requests"
   type        = number
@@ -379,7 +379,7 @@ variable "server_port" {
 
 
 전달된 값은 `var.<VARIABLE_NAME>` 과 같은 형태로 사용 가능하다.  
-```
+```terraform
 resource "aws_security_group" "instance" {
   name = "terraform-example-instance"
 
@@ -393,7 +393,7 @@ resource "aws_security_group" "instance" {
 ```
 
 또한 string literal에서도 `"${...}"`와 같은 형태로 variable을 사용 가능하다.  
-```
+```terraform
   user_data = <<-EOF
               #!/bin/bash
               echo "Hello, World" > index.html
@@ -404,7 +404,7 @@ resource "aws_security_group" "instance" {
 
 ### Output variable
 Terraform은 output variable도 제공한다.
-```
+```terraform
 output "<NAME>" {
   value = <VALUE>
   [CONFIG ...]
@@ -419,7 +419,7 @@ input valiable처럼 몇 가지 optional parameter를 제공한다.
 
 output variable은 우리의 상황에서는 ip등을 전달하여 aws console에 접근하지 않아도 public ip를 제공받을 수 있도록 구성할 수 있다.  
 
-```
+```terraform
 output "public_ip" {
   value       = aws_instance.example.public_ip
   description = "The public IP address of the web server"
@@ -476,7 +476,7 @@ Launch configuration은 ASG에서 각 instance를 어떻게 구성할 지 지정
 - `vpc_security_group_ids` -> `security_groups`
 
 
-```
+```terraform
 resource "aws_launch_configuration" "example" {
   image_id        = "ami-0fb653ca2d3203ac1"
   instance_type   = "t2.micro"
@@ -491,7 +491,7 @@ resource "aws_launch_configuration" "example" {
 ```
 
 ### ASG
-```
+```terraform
 resource "aws_autoscaling_group" "example" {
   launch_configuration = aws_launch_configuration.example.name
 
@@ -521,7 +521,7 @@ Terraform의 모든 resource는 몇가지의 lifecycle setting을 제공한다.
 가장 유용한 lifecycle setting은 `create_before_destroy` 이다.  
 이를 true로 지정하면 Terraform은 resource를 교체하는 순서를 변경한다.
 - 생성 후 교체  
-```
+```terraform
 resource "aws_launch_configuration" "example" {
   image_id        = "ami-0fb653ca2d3203ac1"
   instance_type   = "t2.micro"
@@ -548,14 +548,14 @@ resource "aws_launch_configuration" "example" {
 data source는 Terraform의 provider가 가져오는 일기 전용 정보이다.  
 
 
-```
+```terraform
 data "<PROVIDER>_<TYPE>" "<NAME>" {
   [CONFIG ...]
 }
 ```
 - CONFIG는 각 data source마다 특정한 parameter를 전달할 수 있다.
     - `aws_vpc`는 default를 true로 지정하여 기본 VPC 값을 가져올 수 있다.
-```
+```terraform
 data "aws_vpc" "default" {
   default = true
 }
@@ -565,7 +565,7 @@ data source를 참조하려면 `data.<PROVIDER>_<TYPE>.<NAME>.<ATTRIBUTE>`와 �
 - 위 경우 `data.aws_vpc.default.id`
 
 VPC data source를 통해 subnet list를 가져온다.
-```
+```terraform
 data "aws_subnets" "default" {
   filter {
     name   = "vpc-id"
@@ -575,7 +575,7 @@ data "aws_subnets" "default" {
 ```
 
 위 data source를 사용하면 아래와 같다.
-```
+```terraform
 resource "aws_autoscaling_group" "example" {
   launch_configuration = aws_launch_configuration.example.name
   vpc_zone_identifier  = data.aws_subnets.default.ids
@@ -626,7 +626,7 @@ ALB는 아래와 같은 구조로 구성되어있다.
 
 
 ### Loadbalancer
-```
+```terraform
 resource "aws_lb" "example" {
   name               = "terraform-asg-example"
   load_balancer_type = "application"
@@ -638,7 +638,7 @@ resource "aws_lb" "example" {
 - 확장성과 고가용성이 보장된다.
 
 ### Listener
-```
+```terraform
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.example.arn
   port              = 80
@@ -664,7 +664,7 @@ resource "aws_lb_listener" "http" {
 기본적으로 모든 AWS resource는 들어오고 나가는 모든 트래픽을 허용하지 않는다.  
 따라서, 이를 허용해줄 security group을 구성하고 적용해야 한다.  
 
-```
+```terraform
 resource "aws_security_group" "alb" {
   name = "terraform-example-alb"
 
@@ -685,7 +685,7 @@ resource "aws_security_group" "alb" {
   }
 }
 ```
-```
+```terraform
 resource "aws_lb" "example" {
   name               = "terraform-asg-example"
   load_balancer_type = "application"
@@ -698,7 +698,7 @@ resource "aws_lb" "example" {
 ### Target group
 
 ASG가 사용할 target group 구성
-```
+```terraform
 resource "aws_lb_target_group" "asg" {
   name     = "terraform-asg-example"
   port     = var.server_port
@@ -722,7 +722,7 @@ resource "aws_lb_target_group" "asg" {
 이제 target group이 요청을 전달할 EC2 instance를 연결해줘야 한다.  
 `aws_lb_target_group_attachment`를 사용하여 정적인 instance 목록을 전달할 수 있지만 ASG는 주기적으로 instance를 생성 및 제거하므로 `aws_autoscaling_group`에서 `target_group_arns`를 추가하여  first-class integration를 수행한다.  
 
-```
+```terraform
 resource "aws_autoscaling_group" "example" {
   launch_configuration = aws_launch_configuration.example.name
   vpc_zone_identifier  = data.aws_subnets.default.ids
@@ -745,7 +745,7 @@ resource "aws_autoscaling_group" "example" {
 ### Listener rule
 마지막으로 모든 resource들을 listener rule로 묶어준다.  
 
-```
+```terraform
 resource "aws_lb_listener_rule" "asg" {
   listener_arn = aws_lb_listener.http.arn
   priority     = 100
@@ -764,42 +764,12 @@ resource "aws_lb_listener_rule" "asg" {
 ```
 
 이제 output으로 사용하던 `public_ip`를 ALB의 DNS로 변경해야 한다.  
-```
+```terraform
 output "alb_dns_name" {
   value       = aws_lb.example.dns_name
   description = "The domain name of the load balancer"
 }
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Words
