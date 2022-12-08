@@ -37,7 +37,76 @@ Terraform은 state를 저장하고 가져올 방법을 정하는 backend가 있�
 기본값은 local disk이며 remote backend를 사용하면 공유 공간에 state를 저장할 수 있도록 한다.  
 - S3, Azure Storage, GCS, HashiCorp's Terraform Cloud, Terraform Enterprise
 
+Remote backend는 위 세 가지 문제를 해결한다. 
+- Mannual error
+    - Terraform이 자동으로 state를 가져오고 업데이트한다.
+- Locking
+    - 대부분의 remote backend는 locking을 지원한다.
+    - `terraform apply -lock-timeout=<TIME>`
+- Secrets
+    - 대부분의 remote backend는 state file의 보안을 지원한다.
+        - ex) AWS의 IAM
+    - State file이 로컬에 저장되지 않는다.  
 
+
+S3를 remote backend로 사용기 위해서는 bucket 생성 후 `main.tf`에서 provider와 state를 구성해주면 된다. 
+
+```terraform
+provider "aws {
+    region = "us-east-2"
+}
+
+resource "aws_s3_bucket" "terraform_state" {
+    bucket = "terraform-up-and-running-state"
+
+    # Prevent accidental deletion of this S3 bucket
+    lifecycle {
+        prevent_destroy = true
+    } 
+}
+```
+- prevent_destroy: resource에 해당 옵션을 true로 두면 해당 리소스를 제거하는 모든 Terraform 동작은 error를 발생시킨다.  
+
+추가로 bucket을 보호하기 위한 몇가지 동작을 수행한다.
+
+### 1. Versioning
+```terraform
+# Enable versioning so you can see the full revision history of your
+# state files
+resource "aws_s3_bucket_versioning" "enabled" {
+  bucket = aws_s3_bucket.terraform_state.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+```
+### 2. Server-Side Encryption
+```terraform
+# Enable server-side encryption by default
+resource "aws_s3_bucket_server_side_encryption_configuration" "default" {
+    bucket = aws_s3_bucket.terraform_state.id
+
+    rule {
+        apply_server_side_encryption_by_default {
+            sse_algorithm = "AES256"
+        }
+    } 
+}
+
+```
+### 3. Public Access Block
+```terraform
+# Explicitly block all public access to the S3 bucket
+resource "aws_s3_bucket_public_access_block" "public_access" {
+    bucket                  = aws_s3_bucket.terraform_state.id
+    block_public_acls       = true
+    block_public_policy     = true
+    ignore_public_acls      = true
+    restrict_public_buckets = true
+}
+```
+
+Bucket 보호가 끝났으면 locking을 위한 DynamoDB table을 생성한다.
 
 # Limitations with Terraform’s backends 
 # State file isolation
