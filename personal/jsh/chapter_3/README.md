@@ -106,9 +106,111 @@ resource "aws_s3_bucket_public_access_block" "public_access" {
 }
 ```
 
-Bucket 보호가 끝났으면 locking을 위한 DynamoDB table을 생성한다.
+Bucket 보호가 끝났으면 locking을 위한 DynamoDB table을 생성한다.  
+- 이때, 테이블의 PK는 `LockID`로 지정해야 한다.
+```terraform
+resource "aws_dynamodb_table" "terraform_locks" {
+    name         = "terraform-up-and-running-locks"
+    billing_mode = "PAY_PER_REQUEST"
+    hash_key     = "LockID"
+    attribute {
+        name = "LockID"
+        type = "S"  
+    } 
+}
+```  
+
+S3와 DynamoDB를 구성한 뒤에는 backend에서 해당 저장소들을 사용하도록 구성해야 한다.  
+
+```terraform
+terraform {
+  backend "<BACKEND_NAME>" {
+    [CONFIG...]
+  }
+}
+```
+BACKEND_NAME은 원하는 이름을 지정하면 되고 CONFIG는 한 개 이상의 argument가 존재한다.  
+
+```terraform
+terraform {
+    backend "s3" {
+    # Replace this with your bucket name!
+        bucket          = "terraform-up-and-running-state"
+        key             = "global/s3/terraform.tfstate"
+        region          = "us-east-2"
+
+        # Replace this with your DynamoDB table name!
+        dynamodb_table  = "terraform-up-and-running-locks"
+        encrypt         = true
+    }
+}
+```
+이후 `terraform init`을 수행하면 상태값이 S3에 저장된다.  
+
+
 
 # Limitations with Terraform’s backends 
+### Chicken and Egg Situation
+State를 저장할 S3 Bucket을 Terraform으로 만들기 위해서는 아래 두 단계를 거쳐야 한다.  
+
+1. S3 bucket과 DynamoDB를 만들기 위한 코드 작성 후 local backend에서 배포
+2. Terraform 코드에서 생성된 bucket과 DynamoDB를 바라보도록 remote backend configuration 수정후 `terraform init`으로 local state copy
+
+제거하는 경우에도 마찬가지다.  
+1. Terraform 코드에서 backend configuration 제거후 `terraform init`으로 state를 로컬로 copy
+2. `terrafom destroy`로 S3 bucket과 DynamoDB 제거  
+
+이미 구성되어있는 S3 bucket에 state를 관리한다면 위와 같은 과정은 필요 없을것이고 위와 같은 동작도 모든 Terraform 코드에서 한 번만 수행하면 되기 때문에 큰 문제는 아니라고 생각한다.  
+
+### Backend block variables or reference
+`backend` block은 어느 변수값이나 참조를 사용할 수 없다.  
+```terraform
+# This will NOT work. Variables aren't allowed in a backend configuration.
+terraform {
+    backend "s3" {
+        bucket         = var.bucket
+        region         = var.region
+        dynamodb_table = var.dynamodb_table
+        key            = "example/terraform.tfstate"
+        encrypt        = true
+    } 
+}
+```
+즉, bucket이나 region 정보 등 모든 값을 수동으로 넣어야 한다는 것이다.  
+- 모든 Terrafom module에서 해야된다.
+- Module이 많아질수록 어지러워진다.  
+
+Copy and paste가 아닌 command 옵션에서 `-backend-config`로 값을 전달할 수 있긴 하다.  
+
+반복되는 설정값들을 `backend.hcl` 파일로 생성한다.
+```hcl
+# backend.hcl
+bucket         = "terraform-up-and-running-state"
+region         = "us-east-2"
+dynamodb_table = "terraform-up-and-running-locks"
+encrypt        = true
+```  
+
+이후 `-backend-config` 옵션으로 설정 파일을 전달하면 된다.  
+```
+$ terraform init -backend-config=backend.hcl
+```
+
+> 이런식으로도 가능하다
+```
+$ terraform init \
+    -backend-config="address=demo.consul.io" \
+    -backend-config="path=example_app/terraform_state" \
+    -backend-config="scheme=https"
+```
+
+[Terragrunt](https://terragrunt.gruntwork.io/)라는 오픈소스를 사용하는 방법도 있다.  
+- backend 코드의 반복을 줄여주는 도구  
+
+
+
+
+
 # State file isolation
 ## Isolation via workspaces
 ## Isolation via file layout
