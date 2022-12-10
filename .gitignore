@@ -3,3 +3,4 @@ credential
 *.tfstate
 *.tfstate.backup
 *.DS_Store
+.env
