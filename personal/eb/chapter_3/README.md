@@ -11,7 +11,7 @@
 
 이와 같은 테라폼 구성파일을 `apply` 명령어로 실행하면
 
-```bash
+```
 resource "aws_instance" "example" {
   ami           = "ami-0fb653ca2d3203ac1"
   instance_type = "t2.micro"
@@ -20,7 +20,7 @@ resource "aws_instance" "example" {
 
 아래와 같은 생성한 리소스 정보가 terraform.tfstate 파일에 기록되어 테라폼 명령어 수행시 이전에 생성했던 리소스 정보를 추적한다.
 
-```bash
+```
 {
   "version": 4,
   "terraform_version": "1.2.3",
@@ -82,7 +82,7 @@ resource "aws_instance" "example" {
 - 롤백을 위해 versioning enable
 - 서버 측 암호화 설정. 상태 파일 및 파일에 포함 된 시크릿 암호화
 
-```bash
+```
 provider "aws" {
   region = "us-east-2"
 }
@@ -123,7 +123,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "default" {
     - `LockID` 를 기본키로 지정
     - 강제 잠금 해제 `force-unlock` 가능
 
-```bash
+```
 resource "aws_dynamodb_table" "terraform_locks" {
   name         = "terraform-up-and-running-locks"
   billing_mode = "PAY_PER_REQUEST"
@@ -148,7 +148,7 @@ output "dynamodb_table_name" {
 
 - 테라폼 블록에 백엔드 구성 구문 추가
 
-```bash
+```
 terraform {
   backend "s3" {
     # Replace this with your bucket name!
@@ -165,7 +165,7 @@ terraform {
 
 결과
 
-```bash
+```
 $ terraform apply
 
 (...)
@@ -188,17 +188,17 @@ s3_bucket_arn = "arn:aws:s3:::terraform-up-and-running-state"
 
 ## Dynamodb table
 
-```markdown
+```
 |LockID|Info|
 |------|---|
 |qqllio-terraform-up-and-running-state/global/s3/terraform.tfstate|{"ID":"59fef1d5-d094-c52e-6aa5-e30279394a88","Operation":"OperationTypeApply","Info":"","Who":"aa@aaui-MacBook-Pro.local","Version":"1.1.7","Created":"2022-12-11T09:55:24.570354Z","Path":"qqllio-terraform-up-and-running-state/global/s3/terraform.tfstate"}|
 ```
 
-```bash
+```
 $ terraform destroy
 ```
 
-```markdown
+```
 |LockID|Digest|
 |------|---|
 |qqllio-terraform-up-and-running-state/global/s3/terraform.tfstate-md5|5fced019676836afd36359eb97cd7bd8|
@@ -228,7 +228,7 @@ $ terraform destroy
 
 테라폼 워크스페이스를 통해 테라폼 상태를 별도의 이름을 가진 여러 개의 작업 공간에 저장할 수 있다. 지정하지 않았을 때 ‘default’ 라는 기본 작업 공간이 주어지며 `terraform workspace` 명령을 통해 새 워크 스페이스를 만들고 지울 수 있다.
 
-```bash
+```
 terraform {
   backend "s3" {
     # Replace this with your bucket name!
@@ -243,7 +243,7 @@ terraform {
 }
 ```
 
-```bash
+```
 $ terraform workspace new example1
 Created and switched to workspace "example1"!
 
@@ -278,7 +278,7 @@ for this configuration.
 - 환경 변수를 관리할 수 있음
 - 코드를 반복 작성하지 않을 수 있게 조각 코드를 만들어 참조하고 최종 코드를 생성해줌
 
-```bash
+```
 ├── README.md
 │   ├── modules
 │   │   ├── dev
@@ -309,8 +309,7 @@ for this configuration.
 가령 db의 어드레스, 포트는 실행시 마다 달라질 수 있는데 출력 값을 테라폼 상태 파일에 저장하고 서비스에서 terraform_remote_state 데이터 소스를 추가하여 상태 파일에서 읽어갈 수 있다.
 
 db main.tf
-
-```bash
+```
 output "address" {
   value       = aws_db_instance.example.address
   description = "Connect to the database at this endpoint"
@@ -324,7 +323,7 @@ output "port" {
 
 service main.tf
 
-```bash
+```
 data "terraform_remote_state" "db" {
   backend = "s3"
 
