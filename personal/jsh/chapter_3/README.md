@@ -52,7 +52,7 @@ Remote backend는 위 세 가지 문제를 해결한다.
 S3를 remote backend로 사용기 위해서는 bucket 생성 후 `main.tf`에서 provider와 state를 구성해주면 된다. 
 
 ```terraform
-provider "aws {
+provider "aws" {
     region = "us-east-2"
 }
 
