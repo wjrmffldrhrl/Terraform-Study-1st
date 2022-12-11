@@ -134,7 +134,7 @@ S3를 원격 상태 저장소로 활용하려면 S3 버킷을 생성해야 합�
 }</pre>
 
 버킷은 기본적으로 private이지만 팀원들이 public하게 만들 수 있는 부분을 방지해줍니다.
-</pre>resource "aws_s3_bucket_public_access_block" "public_access" {<br>
+<pre>resource "aws_s3_bucket_public_access_block" "public_access" {<br>
   bucket                  = aws_s3_bucket.terraform_state.id<br>
   block_public_acls       = true<br>
   block_public_policy     = true<br>
@@ -143,7 +143,7 @@ S3를 원격 상태 저장소로 활용하려면 S3 버킷을 생성해야 합�
 }</pre>
 
 다음으로 DynamoDB를 생성하여 잠금이 되도록 설정해줍니다. 이를 위하여 테이블에 LockID 라는 기본 키를 설정해줍니다.
-</pre>resource "aws_dynamodb_table" "terraform_locks" {<br>
+<pre>resource "aws_dynamodb_table" "terraform_locks" {<br>
   name         = "terraform-up-and-running-locks"<br>
   billing_mode = "PAY_PER_REQUEST"<br>
   hash_key     = "LockID"<br>
@@ -197,7 +197,7 @@ encrypt        = true</pre>
   backend "s3" {<br>
     key = "example/terraform.tfstate"<br>
   }<br>
-}</pre
+}</pre>
 
 부분 구성 파일을 적용 시키려면 하단 init 코드를 실행합니다.
 <pre>$ terraform init -backend-config=backend.hcl</pre>
@@ -275,7 +275,8 @@ S3 콘솔에 들어가면 해당 작업공간들이 생성된 것을 확인할 �
 * 각각의 환경에 대한 테라폼 구성 파일들을 각자의 폴더에 생성합니다
 * 서로 다른 인증 메카니즘과 접근 컨트롤을 활용하여 각각의 환경에 다른 백엔드를 구성합니다 (서로 다른 AWS 계정 사용 등)
 
-더 나아가 테라폼 상태 파일을 관리를 환경 단에서 하는 것보다 컴포넌트 단에서 하는 것을 추천합니다. 예를들어 VPC 컴포넌트와 웹서버를 컴포넌트 관련 테라폼 구성들을 한 테라폼 파일에 구성하는 것은 한 컴포넌트에 대해 작업을 할 때 다른 컴포넌트가 잘못 된 영향을 끼칠 수 있는 위험이 있기 때문입니다. 그러므로 다른 환경 내에서도 각자의 컴포넌트 별로 테라폼 폴더를 생성하여 아래와 같이 관리하는 것을 추천합니다. 
+더 나아가 테라폼 상태 파일을 관리를 환경 단에서 하는 것보다 컴포넌트 단에서 하는 것을 추천합니다. 예를들어 VPC 컴포넌트와 웹서버를 컴포넌트 관련 테라폼 구성들을 한 테라폼 파일에 구성하는 것은 한 컴포넌트에 대해 작업을 할 때 다른 컴포넌트가 잘못 된 영향을 끼칠 수 있는 위험이 있기 때문입니다. 그러므로 다른 환경 내에서도 각자의 컴포넌트 별로 테라폼 폴더를 생성하여 아래와 같이 관리하는 것을 추천합니다.
+
 ![alt text](./image/figure3.png)
 
 위의 구조를 살펴봅시다.
@@ -301,18 +302,23 @@ providers.tf: 클라우드 제공자 및 인증 관련 코드들을 포함합니
 main-xxx.tf: 리소스를 관리하는 코드들을 포함합니다. 많은 리소스를 관리될 수 있기 때문에 경우에 따라 더 세부적으로 나누어 관리할 수 있습니다 (main-s3.tf, main-iam.tf).
 
 이와 같이 파일 레이아웃 형식으로 테라폼 상태 파일을 관리하면 장점이 있습니다.
+
 *알아보기 쉬운 코드와 환경 레이아웃*
 * 코드들을 찾기 쉽고 각각의 환경에 어떤 컴포넌트들이 배포되었는지 쉽게 알 수 있습니다
+
 *격리*
 * 환경들이 서로 격리가 될 수 있고 더 나아가 환경 내 컴포넌트들끼리도 격리될 수 있습니다. 이에 따라 실수로 테라폼 상태 파일들을 잘 못 구성하면 오류 확산이 컴포넌트 내로 제한됩니다
 
 하지만 단점들도 당연히 있는데요.
+
 *다수의 폴더에서 작업을 해야합니다*
 * terraform apply 실행 작업을 각각의 폴더 내에서 해야한다는 단점이 있습니다
 - Terragrunt 를 활용하면 이를 보완할 수 있습니다
+
 *복사/붙여넣기를 해야합니다*
 * 파일 레이아웃들이 다양해 지면서 중복되는 코드들이 있습니다
 - 테라폼 모듈을 활용하면 중복 코드를 줄일 수 있습니다
+
 *리소스 의존성 활용이 떨어질 수 있습니다*
 * 앱 구성 코드와 데이터베이스 구성 코드가 같은 레이어에 있으면 변수를 활용하여 서로 관련된 속성들을 참조할 수 있지만 다른 레이어에 있으면 변수를 활용해 참조가 불가하여 리소스 의존성이 떨어집니다.
 
@@ -322,8 +328,11 @@ main-xxx.tf: 리소스를 관리하는 코드들을 포함합니다. 많은 리�
 예를 들어봅시다. 웹서버 클러스터가 MySQL 데이터베이스와 통신을 해야한다고 합시다. 이를 위해서 같은 구성 파일에 데이터베이스와 웹서버를 정의하는 것은 좋지 않은 방법입니다. 웹서버 클러스터를 업데이트 할 경우가 많을 텐데 그럴 때 마다 데이터베이스 구성을 고장낼 위험이 있기 때문입니다. 
 
 이를 방지하기 위해서 하단과 같이 테라폼 파일들을 체계화 해봅니다.
+
 ![alt text](./image/figure4.png)
+
 다음으로 데이터베이스 리소스를 이 주소에 생성해줍니다.
+
 #### stage/data-stores/mysql/main.tf
 <pre>provider "aws" {<br>
   region = "us-east-2"<br>
@@ -342,6 +351,7 @@ resource "aws_db_instance" "example" {<br>
 }</pre>
 
 위의 코드에 데이터베이스의 사용자 이름과 비밀번호를 설정해줘야 하는데요, 이를 위해 변수들을 하단 같이 이 주소에 생성해줍니다.
+
 #### stage/data-stores/mysql/variables.tf
 <pre>variable "db_username" {<br>
   description = "The username for the database"<br>
@@ -370,6 +380,7 @@ variable "db_password" {<br>
 }</pre>
 
 마지막으로 이 주소에 출력변수를 추가하여 데이터베이스의 주소값과 포트값을 받아올 수 있도록 설정해줍니다.
+
 #### stage/data-stores/mysql/outputs.tf 
 <pre>output "address" {<br>
   value       = aws_db_instance.example.address<br>
@@ -392,6 +403,7 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.<br>
 Outputs:<br>
 address = "terraform-up-and-running.cowu6mts6srx.us-east-2.rds.amazonaws.com"<br>
 port = 3306</pre>
+
 이 출력값들은 stage/data-stores/mysql/terraform.tfstate 이 주소에 있는 s3 버킷에 저장이 되며, 이 값들은 웹서버에서 출력변수들을 stage/services/webserver-cluster/main.tf 주소의 terraform_remote_state 데이터 소스를 통해 읽어올 수 있습니다.
 <pre>data "terraform_remote_state" "db" {<br>
   backend = "s3"<br>
@@ -404,11 +416,14 @@ port = 3306</pre>
 }</pre>
 
 이 terraform_remote_state 데이터 소스는 데이터베이스가 상태를 저장하는 동일한 S3 버킷 및 폴더에서 상태 파일을 읽도록 웹 서버 클러스터 코드를 구성합니다.
+
 ![alt text](./image/figure5.png)
 
 모든 테라폼 데이터 소스와 마찬가지로 terraform_remote_state에서 반환된 데이터는 읽기 전용임을 이해하는 것이 중요합니다.
+
 데이터베이스의 모든 출력 변수는 상태 파일에 저장되며 다음 형식의 속성 참조를 사용하여 terraform_remote_state 데이터 소스에서 읽을 수 있습니다.
 <pre>data.terraform_remote_state.<NAME>.outputs.<ATTRIBUTE></pre>
+
 예를 들어 하단과 같이 데이터 소스를 HTTP 응답에 보여줄 수 있습니다.
 <pre>user_data = <<EOF<br>
 #!/bin/bash<br>
@@ -419,6 +434,7 @@ nohup busybox httpd -f -p ${var.server_port} &<br>
 EOF</pre>
 
 위와 같이 bash 스크립트를 그 때 마다 처리하면 코드가 지저분 해집니다. 이를 해결하기 위해서 하단과 같이 bash 파일을 따로 만들어 줍니다.
+
 #### stage/services/webserver-cluster/user-data.sh
 <pre>#!/bin/bash<br>
 cat > index.html <<EOF<br>
