@@ -438,13 +438,15 @@ EOF</pre>
 위와 같이 bash 스크립트를 그 때 마다 처리하면 코드가 지저분 해집니다. 이를 해결하기 위해서 하단과 같이 bash 파일을 따로 만들어 줍니다.
 
 #### stage/services/webserver-cluster/user-data.sh
-<pre>#!/bin/bash<br>
-cat > index.html <<EOF<br>
-<h1>Hello, World</h1><br>
-<p>DB address: ${db_address}</p><br>
-<p>DB port: ${db_port}</p><br>
-EOF<br><br>
-nohup busybox httpd -f -p ${server_port} &</pre>
+```bash
+#!/bin/bash<br>
+cat > index.html <<EOF
+<h1>Hello, World</h1>
+<p>DB address: ${db_address}</p>
+<p>DB port: ${db_port}</p>
+EOF<br>
+nohup busybox httpd -f -p ${server_port} &
+```
 
 그리고 나서 templatefile 함수를 활용하여 위의 변수들의 참조값들을 "aws_launch_configuration" 리소스에 하단과 같이 추가해줍니다.
 <pre>resource "aws_launch_configuration" "example" {<br>
