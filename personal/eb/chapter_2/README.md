@@ -355,74 +355,147 @@ Outputs:
 public_ip = "18.221.24.208"
 ```
 
-# 5) ASG 생성하기
+# 6: 웹서버 클러스터 배포
 
-어차피 뒷부분에서 모두 Load Balancer를 붙이면서 많이 변경되므로 가장 중요한 data에 대한 항목만 다룸. data로 시작하는 정의는 Provider에서 제공하는 API에 대한 값을 조회하는 기능을 가진다. 
+여러대의 서버를 쓰레숄드에 따라 자동으로 증감시키기 위해 오토스케일링 그룹을 사용한다.
 
-예를 들면 현재 지정한 region의 기본 VPC에서 가용한 subnet들의 id에 배포되도록 하고 싶은데 이를 코드에 하드코딩하기 보다는 apply하는 시점에 AWS API를 호출해서 자동으로 삽입되도록 하는 것이 좋다. 
+![Untitled](./asset/chapter_2_3.png)
+
+## 1) 스케일링할 인스턴스 정의
+
+```bash
+resource "aws_launch_configuration" "example" {
+  image_id        = "ami-0fb653ca2d3203ac1"
+  instance_type   = "t2.micro"
+  security_groups = [aws_security_group.instance.id]
+
+  user_data = <<-EOF
+              #!/bin/bash
+              echo "Hello, World" > index.html
+              nohup busybox httpd -f -p ${var.server_port} &
+              EOF
+}
+```
+
+## 2) 오토스케일링 그룹 정의
+
+```bash
+resource "aws_autoscaling_group" "example" {
+  launch_configuration = aws_launch_configuration.example.name
+
+  min_size = 2
+  max_size = 10
+
+  tag {
+    key                 = "Name"
+    value               = "terraform-asg-example"
+    propagate_at_launch = true
+  }
+}
+```
+
+### (1) lifecycle
+
+테라폼은 리소스를 교체할 때 이전 리소스를 삭제하고 다음 대체 리소스를 생성하는데 오토스케일링 그룹에 이전에 생성한 리소스에 대한 참조가 있으므로 테라폼이 이를 삭제 후 생성할 수 없다.  이 문제를 해결하기 위해 lifecycle 을 설정한다. 
+
+```bash
+resource "aws_launch_configuration" "example" {
+  image_id        = "ami-0fb653ca2d3203ac1"
+  instance_type   = "t2.micro"
+  security_groups = [aws_security_group.instance.id]
+
+  user_data = <<-EOF
+              #!/bin/bash
+              echo "Hello, World" > index.html
+              nohup busybox httpd -f -p ${var.server_port} &
+              EOF
+
+  # Required when using a launch configuration with an auto scaling group.
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+```
+
+수명주기를 `create_before_destroy` 로 설정하면 교체 리소스를 먼저 생성한 다음 이전 리소스를 가리키고 있던 모든 참조가 교체 리소스를 가리키도록 업데이트하고 이전 리소스를 삭제한다.
+
+### (2) subnet_id
+
+오토스케일링 그룹에 의해 생성된 ec2를 어느 서브넷에 배포할지 저장하는 매개변수 이다. 각 서브넷은 분리된 데이터센터(AZ)에 있으므로 인스턴스를 여러 서브넷에 배포하면 데이터센터가 중단된 경우에도 서비스를 계속 실행할 수 있다. 이 때 서브넷 아이디를 하드코딩 하기 보단 데이터소스를 사용하여 AWS 계정에서 서브넷 목록을 얻어 구성하는 것이 좋다. 
+
+데이터 소스를 사용 구문
+
+```bash
+data "<PROVIDER>_<TYPE>" "<NAME>" {
+  [CONFIG ...]
+}
+```
+
+서브넷은 vpc 하위에 있으므로 vpc id를 얻어 해당 vpc에 존재하는 서브넷 목록을 받아 올 수 있다.
 
 ```bash
 data "aws_vpc" "default" {
   default = true
 }
 
-data "aws_subnet_ids" "default" {
-  vpc_id = data.aws_vpc.default.id
+data "aws_subnets" "default" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default.id]
+  }
 }
 ```
 
-### Q. data.aws_subnet_ids.default.ids 에는 어떤 값이 있을까?
-
-output에 변수를 연결해서 실제로 어떤 값이 나오는지 확인해보자
+오토스케일링 그룹에 서브넷 아이디 목록을 지정한다
 
 ```bash
-output "subnet_ids" {
-  value       = data.aws_subnet_ids.default.ids
-  description = "The IDs of the subnets used by the load balancer"
+resource "aws_autoscaling_group" "example" {
+  launch_configuration = aws_launch_configuration.example.name
+  vpc_zone_identifier  = data.aws_subnets.default.ids
+
+  min_size = 2
+  max_size = 10
+
+  tag {
+    key                 = "Name"
+    value               = "terraform-asg-example"
+    propagate_at_launch = true
+  }
 }
 ```
 
-toset 이라는 집합으로 subnet id들이 조회되는 것을 볼 수 있다. (흥미롭군..!)
+# 7: 로드밸런서 배포
 
-```bash
-$ terraform apply
-subnet_ids = toset([
-  "subnet-00f9fb4a",
-  "subnet-079a757c",
-  "subnet-48c11f21",
-])
-```
+오토스케일링 그룹에 의해 생성된 인스턴스를 묶어 최종 사용자에게는 단일 DNS만 제공하고 서버 전체에 트래픽을 분산한다.
 
-### Q. data의 값은 dynamic하게 연동되는 값일까?
+![Untitled](asset/chapter_2_4.png)
 
-아니다. `terraform.tfstate` 파일 안에 instance 리소스 내에 위의 값이 똑같이 하드코딩되어 있는 것을 볼 수 있다. 즉, apply가 실행되는 시점에 한정해서 값이 자동으로 삽입되는 구조를 띈다.
+AWS 는 세 가지 유형(ALB, NLB, CLB)의 로드 밸런서를 제공한다. 
 
-# 6) 로드 밸런서 붙이기
+- ALB : 특정 경로 또는 호스트 이름과 일치하는 요청을 특정 대상 그룹으로 라우팅
+- NLB : TCP, UDP 및 TLS 트래픽 로드 밸런싱.
+- CLB : 레거시 로드 밸런서.
 
-프로덕션 환경에서 가장 일반적인 구성을 위해서는 로드 밸런서에 ASG를 붙이고, 트래픽에 따라서 ASG 내의 인스턴스가 자동으로 조절된다. 
+이 예제에선 ALB를 사용한다
 
-이때 AWS의 로드 밸런스는 크게 3가지로 구성된다. 
+![Untitled](asset/chapter_2_5.png)
 
-- ALB : HTTP, HTTPS 에 대한 요청을 다루는데 사용되고, Layer 7 계층에서 실행된다. 장점으로는 path 패턴 매칭을 활용할 수 있기 때문에 path에 따라 다른 서비스로 연결시킬 수 있다. (쿠버네티스의 ingress 리소스와 쿵짝이 잘 맞는 느낌)
-- NLB : Layer 4 계층에서 작동하며 더 넓은 범위의 로드밸런싱 상황에 적합하다.
-- CLB : 클래식이라 신경 안씀
-
-이 예제에서는 간단한 웹 서버이기 때문에 ALB를 사용함
-
-![Untitled](images/Untitled%2010.png)
+### ALB 생성
 
 ```bash
 resource "aws_lb" "example" {
-
-  name               = var.alb_name
-
+  name               = "terraform-asg-example"
   load_balancer_type = "application"
-  subnets            = data.aws_subnet_ids.default.ids # LB 서버들이 작동할 서브넷을 지정
+  subnets            = data.aws_subnets.default.ids
   security_groups    = [aws_security_group.alb.id]
 }
+```
 
+### ALB 리스너 기본 응답 액션 정의
+
+```bash
 resource "aws_lb_listener" "http" {
-  load_balancer_arn = aws_lb.example.arn # 리스너가 붙을 로드 밸런서 지정
+  load_balancer_arn = aws_lb.example.arn
   port              = 80
   protocol          = "HTTP"
 
@@ -437,45 +510,13 @@ resource "aws_lb_listener" "http" {
     }
   }
 }
+```
 
-resource "aws_lb_target_group" "asg" {
+### ALB에 부여할 보안 그룹 생성
 
-  name = var.alb_name
-
-  port     = var.server_port
-  protocol = "HTTP"
-  vpc_id   = data.aws_vpc.default.id
-
-  health_check {
-    path                = "/"
-    protocol            = "HTTP"
-    matcher             = "200"
-    interval            = 15
-    timeout             = 3
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-  }
-}
-
-resource "aws_lb_listener_rule" "asg" {
-  listener_arn = aws_lb_listener.http.arn
-  priority     = 100
-
-  condition {
-    path_pattern {
-      values = ["*"]
-    }
-  }
-
-  action {
-    type             = "forward" # 모든 패턴에 대해서 아래 target gorup으로 forward 시킴
-    target_group_arn = aws_lb_target_group.asg.arn
-  }
-}
-
+```bash
 resource "aws_security_group" "alb" {
-
-  name = var.alb_security_group_name
+  name = "terraform-example-alb"
 
   # Allow inbound HTTP requests
   ingress {
@@ -495,140 +536,76 @@ resource "aws_security_group" "alb" {
 }
 ```
 
-`[http://dns_name](http://dns_name)` 을 입력하면 Hello Word가 잘 뜸. `http//dns_name/hi` 를 입력하니까 404 뜸 
+ALB 타겟 그룹 리소스를 사용하는 대상 그룹 지정 
 
-![Untitled](images/Untitled%2011.png)
+```bash
+resource "aws_lb_target_group" "asg" {
+  name     = "terraform-asg-example"
+  port     = var.server_port
+  protocol = "HTTP"
+  vpc_id   = data.aws_vpc.default.id
 
-> 이때 terraform destroy는 프로덕션 환경에서 가능한 절대 쓰지 말라는 당부의 말씀이 있었음
-
-
-# Q
-
-### **Q. AWS 태그는 어떤 식으로 활용해 볼 수 있을까?**
-
- 회사에서는 `[main.tf](http://main.tf)` 에서 확인해보니 다음과 같이 AWS region과 태그 기본 세팅을 하는 것을 확인했다. 조금 더 고도화가 된다면 각 팀 혹은 코스트 센터 별로 태그를 붙이는 베스트 프랙티스를 얼핏 들었던 것 같다. 그래야 비용 모니터링 할 때 어떤 팀, 어떤 프로덕트에서 얼마나 쓰는지 그룹핑 하기가 쉽다고 함
-
-```json
-provider "aws" {
-  region = var.aws_config.region_name
-
-  default_tags {
-    tags = {
-      Environment = var.environment
-      Owner       = "terraform"
-    }
+  health_check {
+    path                = "/"
+    protocol            = "HTTP"
+    matcher             = "200"
+    interval            = 15
+    timeout             = 3
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
   }
 }
 ```
 
-### **Q. Terraform은 기존에 배포했던 것들을 어떻게 알고 있을까?**
+주기적으로 각 인스턴스에 HTTP 요청을 전송해 인스턴스 상태를 확인하고 구성된 응답과 일치하는 응답을 반환하는 경우에만 인스턴스를 정상으로 간주한다. 위 예의 경우 `/` 패스로 질의하여 http code 200 응답시 정상으로 판단한다. 인스턴스가 비정상으로 판단될 경우 해당 인스턴스로 트래픽 전송을 중지한다. 
 
-위에서 `terraform apply` 명령어를 실행해보니 아래와 같은 아티팩트가 생겼다. 
+### ALB와 타겟 그룹의 매핑
+
+오토스케일링 그룹에 ALB 타겟 그룹 리소스를 정의한다.
 
 ```bash
-.
-├── .terraform
-│   └── providers
-│       └── registry.terraform.io
-│           └── hashicorp
-│               └── aws
-│                   └── 4.45.0
-│                       └── darwin_arm64
-│                           └── terraform-provider-aws_v4.45.0_x5
-├── .terraform.lock.hcl
-├── main.tf
-├── terraform.tfstate
-└── terraform.tfstate.backup
+resource "aws_autoscaling_group" "example" {
+  launch_configuration = aws_launch_configuration.example.name
+  vpc_zone_identifier  = data.aws_subnets.default.ids
+
+  target_group_arns = [aws_lb_target_group.asg.arn]
+  health_check_type = "ELB"
+
+  min_size = 2
+  max_size = 10
+
+  tag {
+    key                 = "Name"
+    value               = "terraform-asg-example"
+    propagate_at_launch = true
+  }
+}
 ```
 
-이때 terraform.tfstate 파일에 들어가보니까 생성한 각종 리소스들의 arn 정보가 추가되어 있는 것을 볼 수 있다.  그리고 `terraform.tfstate.backup` 파일에는 바로 직전 상태의 파일이 저장되어 있는 것을 볼 수 있었다. 
+### ALB 타겟그룹 매핑 룰
 
-
-### **Q. 회사에서는 어디까지 git에 등록해야 할까**
-
-책에 의하면 `.terraform` , `*.tfstate*` 두가지는 `.gitignore`에 등록하고 `.terraform.lock.hcl` 은 commit을 남기라 되어 있다. 자세한 이유는 챕터 3에서 나온다고 함
-
-회사에서 사용 중인 `.gitignore` 세팅
+패스 패턴 조건에 따라 `aws_lb_listener` 의 타겟 그룹 지정
 
 ```bash
-# Local .terraform directories
-**/.terraform/*
-**/.terraform
+resource "aws_lb_listener_rule" "asg" {
+  listener_arn = aws_lb_listener.http.arn
+  priority     = 100
 
-# .tfstate files
-*.tfstate
-*.tfstate.*
-
-# Crash log files
-crash.log
-
-# Exclude all .tfvars files, which are likely to contain sentitive data, such as
-# password, private keys, and other secrets. These should not be part of version
-# control as they are data points which are potentially sensitive and subject
-# to change depending on the environment.
-#
-*.tfvars
-
-# Ignore override files as they are usually used to override resources locally and so
-# are not checked in
-override.tf
-override.tf.json
-*_override.tf
-*_override.tf.json
-
-# Include override files you do wish to add to version control using negated pattern
-#
-# !example_override.tf
-
-# Include tfplan files to ignore the plan output of command: terraform plan -out=tfplan
-# example: *tfplan*
-
-# Ignore CLI configuration files
-.terraformrc
-terraform.rc
-```
-
-### **Q. `terraform.tfstate` 파일을 삭제하고 다시 `terraform apply` 를 실행하면 어떻게 될까?**
-
-파일을 삭제하고 terraform plan, apply를 해보니 기존에 자기가 만들어놨던 것을 인식하지 못하고 새로 만들어버린다. 즉, .tfstate 파일이 terraform이 만들었던 리소스와 현재 코드와의 변경점을 찾는데 핵심적인 파일임. 이거 잃어버리거나 삭제되면 중복 리소스가 생성될 수 있음
-
-![Untitled](images/Untitled%202.png)
-
-**Q. 기존에 만들었던 리소스를 콘솔에서 직접 수정하고 다시 apply를 하면 원래 코드대로 되돌려 놓을까?**
-
-자동으로 만들어졌던 태그와 함께 콘솔 상에서 새로운 태그를 추가해봄
-
-![Untitled](images/Untitled%203.png)
-
-terraform plan을 해보니 .tfstate 파일에 의해 기존에 만들었던 리소스의 상태를 대조하더니, update가 필요한 부분이 있음을 보여줌
-
-```bash
-aws_instance.example: Refreshing state... [id=i-02860732c066283d7]
-
-Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the following symbols:
-  ~ update in-place
-
-Terraform will perform the following actions:
-
-  # aws_instance.example will be updated in-place
-  ~ resource "aws_instance" "example" {
-        id                                   = "i-02860732c066283d7"
-      ~ tags                                 = {
-          - "manual" = "hi" -> null
-            # (1 unchanged element hidden)
-        }
-      ~ tags_all                             = {
-          - "manual" = "hi" -> null
-            # (1 unchanged element hidden)
-        }
-        # (29 unchanged attributes hidden)
-
-        # (7 unchanged blocks hidden)
+  condition {
+    path_pattern {
+      values = ["*"]
     }
+  }
 
-Plan: 0 to add, 1 to change, 0 to destroy.
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.asg.arn
+  }
+}
 ```
 
-apply까지 하니 다시 원래 태그로 돌아옴. 챕터1에서 Terraform은 변경사항이 생겼을 때 삭제하고 다시 만든다고 되어 있지만, 변경 사항의 종류에 따라서 기존 리소스를 update하는 것도 존재함을 알게됨.
+### 리소스 정리
 
-따라서 terraform으로 만든 리소스는 콘솔 상에서 수동으로 변경해봤자 다음 apply에 모두 원복되므로 한번 코드로 관리를 시작하면 계속 코드로 관리해야 됨을 알 수 있음
+```bash
+terraform destroy
+```
