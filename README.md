@@ -85,8 +85,6 @@ $ terraform apply
 
 ## :tokyo_tower: 장소
 - Google meet에서 온라인으로 진행해요
-  - [재영](https://github.com/heartcored98)님이 캘린더로 초대 주실 예정이에요
-  - [Week 0](https://github.com/wjrmffldrhrl/Terraform-Study-1st/issues/3)에 이메일을 코멘트로 남겨주세요
 - 스터디 4회차가 모두 끝나면 점심 or 저녁을 함께 해보려고 해요
   - 필수는 아니에요 😄
 
