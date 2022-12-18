@@ -470,3 +470,101 @@ nohup busybox httpd -f -p ${server_port} &
 
 ## 결론
 격리, 잠금 및 상태에 대해 많은 생각을 해야 하는 이유는 코드형 인프라(IaC)가 일반 코딩과 다른 장단점이 있기 때문입니다. 일반적인 앱에 대한 코드를 작성할 때 대부분의 버그는 상대적으로 사소하며 단일 앱의 작은 부분만 손상시킵니다. 인프라를 제어하는 ​​코드를 작성할 때 버그는 모든 앱, 모든 데이터 저장소, 전체 네트워크 토폴로지 및 거의 모든 것을 손상시킬 수 있다는 점에서 더 심각한 경향이 있습니다. 따라서 일반적인 코드보다 IaC에서 작업할 때 더 많은 "안전 메커니즘"을 포함하는 것이 좋습니다.
+
+
+
+
+**Q. lifecycle prevent_destroy = true 는 어디까지 막아주는걸까?**
+
+1. 아무것도 안 바꾸고 콘솔에서 삭제 시도 : 내용물을 비우고 삭제하라고 경고해줌. 내용물 비우고 버킷 삭제 시도 : 잘 지워짐
+    
+    ![Untitled](images/Untitled.png)
+    
+
+1. resource를 comment 했을 때 apply 재시도 : destory될 것이라고 경고해줌. 
+2. resource 이름을 그대로 둔 채로 table 이름만 변경 : **prevent_destroy Error 발생**
+    
+    ![Untitled](images/Untitled%201.png)
+    
+3. 동일한 table 이름에 resource 이름만 변경 : 기존에 생성했던 리소스는 전혀 인지하지 못하고 새로 만들려고 함
+
+공식 가이드(**The `lifecycle` Meta-Argument**)에 의하면 이 기능은 어디까지나 configuration에 lifecycle block이 남아 있을 때만 제 기능을 하며 변경 사항에 의해 삭제가 감지될 때 error를 일으키는 것이라고 함
+
+> 결론적으로 terraform 리소스 레퍼런스가 동일하게 유지되어서 이전 tfstate와 현재의 configuration이 매칭되는 리소스에 한해서 recreate가 필요한 변경 분에 대해서만 error를 발생시킴
+
+
+
+**Q. 동시에 돌릴려고 할 때 진짜로 Locking이 될까?** 
+
+동시에 terraform plan을 실행시켜 봄. 한쪽은 state lock을 Acquiring하는데 실패했다고 뜸. 그리고 누가 Lock을 소유하고 있는지도 표시해줌..!
+
+![Untitled](images/Untitled%202.png)
+
+
+## 번외편 - Secret Backend를 사용하는 법
+
+아래와 같이 password를 지정할 때 코드에 바로 입력하는 것이 아니라 다양한 secret manager를 사용할 수 있다. 
+
+```json
+{
+
+  password = data.aws_secretsmanager_secret_version.db_password.secret_string 
+}
+
+data "aws_secretsmanager_secret_version" "db_password" {
+  secret_id = "mysql-master-password-stage"
+}
+
+```
+
+- AWS Secrets Manager
+- AWS System Manager Parameter Store (SSM)
+- AWS Key Management Service (KMS)
+- Google Cloud KMS
+- Azure Key Vault
+- HashiCorp Vault
+
+혹은 아예 environment로 다루는 방법도 있다. db_password를 variable로 지정하고, 아래와 같이 실행하면 `TF_VAR_` 로 시작하는 환경변수들이 terraform 환경 변수로 주입된다. 
+
+```bash
+$ export TF_VAR_db_password="<비밀번호>"
+$ terraform apply
+
+```
+
+이때 bash 실행 기록은 로컬에 저장되어 탈취 가능성이 있어서 이를 더 예방하고자 한다면 [pass](https://www.passwordstore.org/) 라고 하는 unix secret manager를 활용해서 명령어로 넘기는 방식도 있다. 
+
+```bash
+$ export TF_VAR_db_password=$(pass database-password)
+$ terraform apply
+```
+
+## 번외편 - file rendering 해서 쓰기
+
+방대한 bash script 등을 terraform 파일 내에 inline으로 관리하려면 꽤나 유지보수가 어려워지고 실수하기도 쉬움. 이를 극복하기 위해서 `file()` 명령어를 쓰면 파일 내 콘텐츠를 string으로 불러올 수 있음
+
+그러나 파일 콘텐츠를 변수화하여 동적으로 생성할 때는 아래와 같은 template 기능이 유용할 수 있음. 우선 파일 내에 변수활 영역은 ${변수명} 과 같이 뚫어놓음
+
+```bash
+cat > index.html <<EOF
+<h1>Hello, world</h1>
+<p>DB address: ${db_address}</p>
+<p>DB port : ${db_port}</p>
+EOF
+```
+
+이후에 아래와 같이 template_file 이라는 data 리소스를 생성하면 동적으로 파일을 생성할 수 있다. 
+
+```bash
+data "template_file" "user_data" {
+  template = file("user-data.sh"n)
+
+  vars = {
+    serveer_port = var.server_port
+    db_address   = data.terraform_remote_state.db.outputs.address
+    db_port      = data.terraform_remote_state.db.outputs.port 
+  }
+}
+```
+
+> 추후에 ES Cloud에서 user_settings.yaml 파일을 넣는 옵션이 있는데 이를 변수화 할 때 사용하면 좋을 것 같다.
