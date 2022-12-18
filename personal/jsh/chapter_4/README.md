@@ -307,7 +307,8 @@ resource "aws_autoscaling_schedule" "scale_in_at_night" {
 
 물론 webserver_cluster 모듈에서는 output block을 정의해줘야 한다.  
 
-### /modules/services/webserver-cluster/outputs.tf
+### modules/services/webserver-cluster/outputs.tf 
+
 ```terraform
 output "alb_dns_name" {
   value       = aws_lb.example.dns_name
