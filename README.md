@@ -85,8 +85,6 @@ $ terraform apply
 
 ## :tokyo_tower: 장소
 - Google meet에서 온라인으로 진행해요
-  - [재영](https://github.com/heartcored98)님이 캘린더로 초대 주실 예정이에요
-  - [Week 0](https://github.com/wjrmffldrhrl/Terraform-Study-1st/issues/3)에 이메일을 코멘트로 남겨주세요
 - 스터디 4회차가 모두 끝나면 점심 or 저녁을 함께 해보려고 해요
   - 필수는 아니에요 😄
 
@@ -121,8 +119,8 @@ $ terraform apply
 |:---:|:---:|---|:---:|
 |0주차|11/20|Planning|[조승현](https://github.com/wjrmffldrhrl)|
 |1주차|11/27|Why Terraform|[조승현](https://github.com/wjrmffldrhrl)|
-|2주차|12/4|Getting Started With Terraform||
-|3주차|12/11|How To Manage Terraform State||
+|2주차|12/4|Getting Started With Terraform|[이은빈](https://github.com/teno4944), [조재영](https://github.com/heartcored98)|
+|3주차|12/11|How To Manage Terraform State|[허준혁](https://github.com/JamesHeo), [조승현](https://github.com/wjrmffldrhrl)|
 |4주차|12/18|How To Create Reusable Infrastructure With Terraform Modules||  
 
 # :door: 참여 방법
