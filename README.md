@@ -121,7 +121,7 @@ $ terraform apply
 |1주차|11/27|Why Terraform|[조승현](https://github.com/wjrmffldrhrl)|
 |2주차|12/4|Getting Started With Terraform|[이은빈](https://github.com/teno4944), [조재영](https://github.com/heartcored98)|
 |3주차|12/11|How To Manage Terraform State|[허준혁](https://github.com/JamesHeo), [조승현](https://github.com/wjrmffldrhrl)|
-|4주차|12/18|How To Create Reusable Infrastructure With Terraform Modules||  
+|4주차|12/18|How To Create Reusable Infrastructure With Terraform Modules|[바삭한다리](https://github.com/0805004949), [김건우](https://github.com/kgw7401)|  
 
 # :door: 참여 방법
 아래 방법중 하나로 성함과 깃허브 아이디를 전달해주세요~!
