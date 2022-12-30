@@ -149,13 +149,13 @@ K8S, Marathon/Mesos, ECS, Swarm, Nomad
 # Terraform configuration
 
 resource "aws_instance" "app" {
-    instance_type = "t2.micro"
-    availability_zone = "us-east-2a"
-    ami = "ami-0c55b159cnfafe1f0"
-    user_data = <<- EOF
-           #! /bin/bash
-           sudo service apache2 start
-           EOF
+	instance_type = "t2.micro"
+	availability_zone = "us-east-2a"
+	ami = "ami-0c55b159cnfafe1f0"
+	user_data = <<- EOF
+		   #! /bin/bash
+		   sudo service apache2 start
+		   EOF
 }
 
 ```
@@ -227,18 +227,18 @@ provisiong tools또한 어느정도의 configuration 할 수 있다 (테라폼�
     ```bash
     # ansible 코드 
     - ec2:
-        count: 10 -> 5개로 수정해야하함
-        image : ami-0c55b159cbfafe1f0
-        instance-type: t2.micro
+    	count: 10 -> 5개로 수정해야하함
+    	image : ami-0c55b159cbfafe1f0
+    	instance-type: t2.micro
     
     ```
     
     ```yaml
     # Terraform 코드 
     resource "aws_instance" "example" {
-        count = 10 -> 15개
-        ami = "ami-0c55b159cbfafe1f0"
-        instance_type = "t2.micro"
+    	count = 10 -> 15개
+    	ami = "ami-0c55b159cbfafe1f0"
+    	instance_type = "t2.micro"
     }
     ```
     
@@ -248,9 +248,9 @@ provisiong tools또한 어느정도의 configuration 할 수 있다 (테라폼�
     
     ```go
     resource "aws_instance" "example" {
-        count = 15
-        ami = "ami-02bccb11111111b802"
-        instance_type = "t2.micro"
+    	count = 15
+    	ami = "ami-02bccb11111111b802"
+    	instance_type = "t2.micro"
     }
     ```
     
